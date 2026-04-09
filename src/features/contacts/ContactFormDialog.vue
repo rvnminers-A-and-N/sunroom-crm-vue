@@ -2,14 +2,14 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useContactStore } from '@/stores/contact.store'
 import { useTagStore } from '@/stores/tag.store'
-import type { Contact } from '@/core/models/contact'
+import type { Contact, ContactDetail } from '@/core/models/contact'
 import type { Company } from '@/core/models/company'
 import apiClient from '@/core/api/client'
 import type { PaginatedResponse } from '@/core/models/pagination'
 
 const props = defineProps<{
   modelValue: boolean
-  contact: Contact | null
+  contact: Contact | ContactDetail | null
 }>()
 
 const emit = defineEmits<{
