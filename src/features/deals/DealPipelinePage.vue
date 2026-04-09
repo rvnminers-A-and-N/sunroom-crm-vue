@@ -211,4 +211,10 @@ function onFormSaved() {
     padding: 24px 0;
   }
 }
+
+@media (max-width: 768px) {
+  .pipeline__column {
+    flex: 0 0 260px;
+  }
+}
 </style>

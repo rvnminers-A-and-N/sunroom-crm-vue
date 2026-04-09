@@ -15,7 +15,7 @@ withDefaults(
 </script>
 
 <template>
-  <div class="stat-card sr-card">
+  <div class="stat-card sr-card sr-card-hover">
     <div class="stat-card__icon" :style="{ background: iconBg }">
       <v-icon :style="{ color: iconColor }">{{ icon }}</v-icon>
     </div>

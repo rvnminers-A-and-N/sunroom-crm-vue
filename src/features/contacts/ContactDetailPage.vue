@@ -150,9 +150,10 @@ async function onDelete() {
     />
   </template>
 
-  <p v-else-if="contactStore.loading" style="text-align: center; color: #9ca3af; padding: 48px">
-    Loading contact...
-  </p>
+  <div v-else-if="contactStore.loading" class="sr-loading">
+    <v-progress-circular indeterminate color="primary" />
+    <span>Loading contact...</span>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -326,6 +327,11 @@ async function onDelete() {
 }
 
 @media (max-width: 640px) {
+  .contact-detail__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .contact-detail__actions {
     width: 100%;
     justify-content: flex-end;

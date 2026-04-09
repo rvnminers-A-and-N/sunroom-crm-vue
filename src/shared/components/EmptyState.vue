@@ -20,7 +20,9 @@ const emit = defineEmits<{
 
 <template>
   <div class="empty-state">
-    <v-icon size="48" color="grey-lighten-1">{{ icon }}</v-icon>
+    <div class="empty-state__icon-wrap">
+      <v-icon size="48" color="grey-lighten-1">{{ icon }}</v-icon>
+    </div>
     <h3 class="empty-state__title">{{ title }}</h3>
     <p class="empty-state__message">{{ message }}</p>
     <v-btn v-if="actionLabel" color="primary" @click="emit('action')">
@@ -37,6 +39,16 @@ const emit = defineEmits<{
   justify-content: center;
   padding: 48px 24px;
   text-align: center;
+
+  &__icon-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   &__title {
     font-size: 18px;
