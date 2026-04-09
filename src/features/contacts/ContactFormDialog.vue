@@ -49,7 +49,7 @@ watch(
       email.value = c?.email ?? ''
       phone.value = c?.phone ?? ''
       title.value = c?.title ?? ''
-      companyId.value = c?.companyId ?? null
+      companyId.value = c ? ('companyId' in c ? c.companyId : c.company?.id ?? null) : null
       tagIds.value = []
       notes.value = ''
     }
