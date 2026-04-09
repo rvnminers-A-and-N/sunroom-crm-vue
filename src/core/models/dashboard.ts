@@ -2,8 +2,8 @@ export interface DashboardData {
   totalContacts: number
   totalCompanies: number
   totalDeals: number
-  totalActivities: number
-  totalDealValue: number
+  totalPipelineValue: number
+  wonRevenue: number
   dealsByStage: DealStageCount[]
   recentActivities: RecentActivity[]
 }
@@ -19,5 +19,6 @@ export interface RecentActivity {
   type: string
   subject: string
   contactName: string | null
+  userName: string
   occurredAt: string
 }
