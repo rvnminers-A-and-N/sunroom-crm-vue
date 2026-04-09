@@ -150,9 +150,10 @@ async function onDelete() {
     />
   </template>
 
-  <p v-else-if="companyStore.loading" style="text-align: center; color: #9ca3af; padding: 48px">
-    Loading company...
-  </p>
+  <div v-else-if="companyStore.loading" class="sr-loading">
+    <v-progress-circular indeterminate color="primary" />
+    <span>Loading company...</span>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -286,6 +287,21 @@ async function onDelete() {
 @media (max-width: 1024px) {
   .company-detail__body {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .company-detail__header {
+    flex-wrap: wrap;
+  }
+
+  .company-detail__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .table-section :deep(.v-table) {
+    overflow-x: auto;
   }
 }
 </style>

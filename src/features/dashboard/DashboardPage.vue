@@ -62,7 +62,10 @@ onMounted(() => {
       </div>
     </template>
 
-    <p v-else-if="store.loading" class="dashboard__loading">Loading dashboard...</p>
+    <div v-else-if="store.loading" class="sr-loading">
+      <v-progress-circular indeterminate color="primary" />
+      <span>Loading dashboard...</span>
+    </div>
   </div>
 </template>
 
@@ -98,11 +101,6 @@ onMounted(() => {
     gap: 16px;
   }
 
-  &__loading {
-    text-align: center;
-    color: #9ca3af;
-    padding: 48px 0;
-  }
 }
 
 @media (max-width: 1024px) {

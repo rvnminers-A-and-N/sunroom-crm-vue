@@ -100,7 +100,11 @@ function logout() {
 
   <v-main>
     <div class="layout-content">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </div>
   </v-main>
 </template>
@@ -150,6 +154,11 @@ function logout() {
   &__nav {
     flex: 1;
     padding: 0 8px;
+
+    :deep(.v-list-item) {
+      margin-bottom: 2px;
+      transition: background-color 0.15s ease;
+    }
   }
 
   &__footer {

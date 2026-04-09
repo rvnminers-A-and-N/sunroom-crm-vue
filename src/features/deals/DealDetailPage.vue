@@ -165,9 +165,10 @@ function getStageClass(stage: string): string {
     />
   </template>
 
-  <p v-else-if="dealStore.loading" style="text-align: center; color: #9ca3af; padding: 48px">
-    Loading deal...
-  </p>
+  <div v-else-if="dealStore.loading" class="sr-loading">
+    <v-progress-circular indeterminate color="primary" />
+    <span>Loading deal...</span>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -367,6 +368,21 @@ function getStageClass(stage: string): string {
 @media (max-width: 1024px) {
   .deal-detail__body {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .deal-detail__header {
+    flex-wrap: wrap;
+  }
+
+  .deal-detail__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .deal-detail__stepper {
+    overflow-x: auto;
   }
 }
 </style>
