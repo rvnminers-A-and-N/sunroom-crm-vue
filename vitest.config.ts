@@ -7,8 +7,36 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'jsdom',
+      globals: true,
+      setupFiles: ['src/test/setup.ts'],
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
+      server: {
+        deps: {
+          inline: ['vuetify'],
+        },
+      },
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'lcov', 'html'],
+        include: ['src/**/*.{ts,vue}'],
+        exclude: [
+          'src/main.ts',
+          'src/App.vue',
+          'src/plugins/vuetify.ts',
+          'src/core/models/**',
+          'src/test/**',
+          '**/__tests__/**',
+          '**/*.d.ts',
+          '**/*.config.*',
+          'env.d.ts',
+          'dist/**',
+          'coverage/**',
+        ],
+        // The 100% thresholds are enabled in feature/ci-and-coverage-gate
+        // so that intermediate test branches can still run `test:coverage`
+        // without failing before every file is covered.
+      },
     },
   }),
 )
