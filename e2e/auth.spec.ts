@@ -10,14 +10,14 @@ test.describe('Authentication', () => {
     await page.goto('/auth/login')
     await expect(page.getByText('Welcome back')).toBeVisible()
     await expect(page.getByLabel('Email')).toBeVisible()
-    await expect(page.getByLabel('Password')).toBeVisible()
+    await expect(page.getByLabel('Password', { exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible()
   })
 
   test('logs in with valid credentials and reaches dashboard', async ({ page }) => {
     await page.goto('/auth/login')
     await page.getByLabel('Email').fill(TEST_USER.email)
-    await page.getByLabel('Password').fill(TEST_USER.password)
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password)
     await page.getByRole('button', { name: 'Sign In' }).click()
     await expect(page).toHaveURL(/\/dashboard/)
     await expect(page.getByText('Dashboard')).toBeVisible()
@@ -26,7 +26,7 @@ test.describe('Authentication', () => {
   test('shows error on invalid credentials', async ({ page }) => {
     await page.goto('/auth/login')
     await page.getByLabel('Email').fill('wrong@example.com')
-    await page.getByLabel('Password').fill('WrongPass1!')
+    await page.getByLabel('Password', { exact: true }).fill('WrongPass1!')
     await page.getByRole('button', { name: 'Sign In' }).click()
     await expect(page.getByRole('alert')).toBeVisible()
   })

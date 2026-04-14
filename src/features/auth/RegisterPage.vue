@@ -28,8 +28,9 @@ async function onSubmit() {
       password: password.value,
     })
     router.push({ name: 'dashboard' })
-  } catch (err: any) {
-    error.value = err.response?.data?.message || 'Registration failed. Please try again.'
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } }
+    error.value = e.response?.data?.message || 'Registration failed. Please try again.'
   } finally {
     loading.value = false
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import userEvent from '@testing-library/user-event'
-import { fireEvent } from '@testing-library/vue'
+import { fireEvent, waitFor } from '@testing-library/vue'
 import { http, HttpResponse } from 'msw'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { server } from '@/test/msw/server'
@@ -54,8 +54,9 @@ describe('RegisterPage', () => {
     const { getByLabelText, container } = renderWithPlugins(RegisterPage, { router })
     await fillValidForm(user, (l) => getByLabelText(l))
     await fireEvent.submit(container.querySelector('form') as HTMLFormElement)
-    await new Promise((r) => setTimeout(r, 50))
-    expect(router.currentRoute.value.name).toBe('dashboard')
+    await waitFor(() => {
+      expect(router.currentRoute.value.name).toBe('dashboard')
+    })
   })
 
   it('shows a "passwords do not match" error and never submits when the confirmation differs', async () => {

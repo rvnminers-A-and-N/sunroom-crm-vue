@@ -22,7 +22,7 @@ export const test = base.extend<{ authenticatedPage: ReturnType<typeof base['pag
   authenticatedPage: async ({ page }, use) => {
     await page.goto('/auth/login')
     await page.getByLabel('Email').fill(TEST_USER.email)
-    await page.getByLabel('Password').fill(TEST_USER.password)
+    await page.getByLabel('Password', { exact: true }).fill(TEST_USER.password)
     await page.getByRole('button', { name: 'Sign In' }).click()
     await page.waitForURL('**/dashboard')
     await use(page)

@@ -10,7 +10,7 @@ test.describe('Admin', () => {
   test('admin users can access user management', async ({ page }) => {
     await page.goto('/auth/login')
     await page.getByLabel('Email').fill(TEST_ADMIN.email)
-    await page.getByLabel('Password').fill(TEST_ADMIN.password)
+    await page.getByLabel('Password', { exact: true }).fill(TEST_ADMIN.password)
     await page.getByRole('button', { name: 'Sign In' }).click()
     await page.waitForURL('**/dashboard')
     await page.goto('/admin')
