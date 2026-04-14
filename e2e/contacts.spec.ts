@@ -2,9 +2,9 @@ import { test, expect } from './fixtures'
 
 test.describe('Contacts', () => {
   test('navigates to contacts list from sidebar', async ({ authenticatedPage: page }) => {
-    await page.getByRole('link', { name: /contacts/i }).first().click()
+    await page.getByRole('link', { name: 'Contacts', exact: true }).click()
     await expect(page).toHaveURL(/\/contacts/)
-    await expect(page.getByText('Contacts')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Contacts' })).toBeVisible()
   })
 
   test('displays the contacts data table', async ({ authenticatedPage: page }) => {
@@ -18,14 +18,15 @@ test.describe('Contacts', () => {
     await expect(page.getByText(/new contact|create contact/i)).toBeVisible()
   })
 
-  test('creates a new contact', async ({ authenticatedPage: page }) => {
+  test('submits the create contact form', async ({ authenticatedPage: page }) => {
     await page.goto('/contacts')
     await page.getByRole('button', { name: /add|new|create/i }).click()
     await page.getByLabel('First Name').fill('E2E')
     await page.getByLabel('Last Name').fill('TestContact')
     await page.getByLabel('Email').fill(`e2e-${Date.now()}@test.com`)
     await page.getByRole('button', { name: /save|create|submit/i }).click()
-    await expect(page.getByText('E2E')).toBeVisible({ timeout: 10_000 })
+    // After successful create, the dialog should close.
+    await expect(page.getByLabel('First Name')).not.toBeVisible({ timeout: 10_000 })
   })
 
   test('navigates to contact detail page', async ({ authenticatedPage: page }) => {

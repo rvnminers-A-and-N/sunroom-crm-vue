@@ -3,7 +3,7 @@ import { test, expect } from './fixtures'
 test.describe('Companies', () => {
   test('displays companies list', async ({ authenticatedPage: page }) => {
     await page.goto('/companies')
-    await expect(page.getByText('Companies')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Companies' })).toBeVisible()
     await expect(page.locator('table, .v-data-table').first()).toBeVisible()
   })
 
