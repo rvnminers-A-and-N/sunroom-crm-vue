@@ -33,9 +33,12 @@ export default mergeConfig(
           'dist/**',
           'coverage/**',
         ],
-        // The 100% thresholds are enabled in feature/ci-and-coverage-gate
-        // so that intermediate test branches can still run `test:coverage`
-        // without failing before every file is covered.
+        thresholds: {
+          lines: 100,
+          functions: 100,
+          branches: 100,
+          statements: 100,
+        },
       },
     },
   }),
