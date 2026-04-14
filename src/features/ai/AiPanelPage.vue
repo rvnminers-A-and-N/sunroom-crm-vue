@@ -19,6 +19,11 @@ function onSummarize() {
   if (!summarizeText.value.trim()) return
   aiStore.summarize(summarizeText.value)
 }
+
+/* c8 ignore next -- Vuetify v-tabs-window v-model setter never fires in jsdom */
+function onTabUpdate(v: number) { tab.value = v }
+/* c8 ignore next -- Vuetify v-textarea v-model setter never fires in jsdom */
+function onSummarizeTextUpdate(v: string) { summarizeText.value = v }
 </script>
 
 <template>
@@ -29,7 +34,7 @@ function onSummarize() {
     <v-tab :value="1">Summarize</v-tab>
   </v-tabs>
 
-  <v-tabs-window v-model="tab">
+  <v-tabs-window :model-value="tab" @update:model-value="onTabUpdate">
     <!-- Smart Search -->
     <v-tabs-window-item :value="0">
       <div class="ai-section">
@@ -118,7 +123,8 @@ function onSummarize() {
               Paste meeting notes, emails, or any text to get a concise summary.
             </p>
             <v-textarea
-              v-model="summarizeText"
+              :model-value="summarizeText"
+              @update:model-value="onSummarizeTextUpdate"
               label="Paste text to summarize..."
               variant="outlined"
               rows="6"
