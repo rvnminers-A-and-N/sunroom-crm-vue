@@ -320,8 +320,8 @@ describe('ActivityFormDialog', () => {
     })
     open.value = false
     await waitFor(() => {
-      const titles = Array.from(document.body.querySelectorAll('.v-card-title'))
-      expect(titles.length === 0 || !titles.some((t) => t.textContent?.includes('Edit Activity')))
+      const overlay = document.body.querySelector('.v-overlay__content') as HTMLElement
+      expect(overlay?.style.display).toBe('none')
     })
     activity.value = makeActivity({ id: 11, subject: 'Second Activity' })
     open.value = true

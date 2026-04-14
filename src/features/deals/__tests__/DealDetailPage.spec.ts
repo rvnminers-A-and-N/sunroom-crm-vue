@@ -269,10 +269,9 @@ describe('DealDetailPage', () => {
       expect(document.body.textContent).not.toContain('Enterprise License')
     })
     // Access the computed via the component proxy to ensure the null guard runs.
-    if (compRef.value?.$.setupState?.currentStageIndex !== undefined) {
-      // Reading .value forces the computed getter to run with d.value = null.
-      expect(compRef.value.$.setupState.currentStageIndex).toBe(0)
-    }
+    // Reading .value forces the computed getter to run with d.value = null.
+    const stageIndex = compRef.value?.$.setupState?.currentStageIndex
+    expect(stageIndex === undefined || stageIndex === 0).toBeTruthy()
   })
 
   it('handles a deal whose stage is not in ALL_STAGES', async () => {

@@ -5,7 +5,7 @@ import { http, HttpResponse } from 'msw'
 import { VApp } from 'vuetify/components'
 import { server } from '@/test/msw/server'
 import { renderWithPlugins } from '@/test/render'
-import { makeCompany, makeContact, makeDeal, makeDealDetail } from '@/test/fixtures'
+import { makeCompany, makeContact, makeDeal } from '@/test/fixtures'
 import DealFormDialog from '../DealFormDialog.vue'
 
 const API = 'http://localhost:5236/api'
@@ -387,8 +387,8 @@ describe('DealFormDialog', () => {
     })
     open.value = false
     await waitFor(() => {
-      const titles = Array.from(document.body.querySelectorAll('.v-card-title'))
-      expect(titles.length === 0 || !titles.some((t) => t.textContent?.includes('Edit Deal')))
+      const overlay = document.body.querySelector('.v-overlay__content') as HTMLElement
+      expect(overlay?.style.display).toBe('none')
     })
     deal.value = makeDeal({ id: 13, title: 'Second Deal' })
     open.value = true

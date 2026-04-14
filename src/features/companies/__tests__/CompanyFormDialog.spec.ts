@@ -281,8 +281,8 @@ describe('CompanyFormDialog', () => {
     // again on the false→true transition and reset the fields.
     open.value = false
     await waitFor(() => {
-      const titles = Array.from(document.body.querySelectorAll('.v-card-title'))
-      expect(titles.length === 0 || !titles.some((t) => t.textContent?.includes('Edit Company')))
+      const overlay = document.body.querySelector('.v-overlay__content') as HTMLElement
+      expect(overlay?.style.display).toBe('none')
     })
     company.value = makeCompany({ id: 13, name: 'Second' })
     open.value = true

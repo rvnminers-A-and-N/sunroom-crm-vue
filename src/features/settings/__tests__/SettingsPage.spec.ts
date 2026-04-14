@@ -57,7 +57,7 @@ describe('SettingsPage', () => {
 
   it('shows "No tags yet" when tag list is empty', async () => {
     server.use(http.get(`${API}/tags`, () => HttpResponse.json([])))
-    const result = renderPage()
+    renderPage()
     setupAuth()
     await waitFor(() => {
       expect(document.body.textContent).toContain('No tags yet')
