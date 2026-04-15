@@ -1,4 +1,4 @@
-import { test, expect, TEST_ADMIN } from './fixtures'
+import { test, expect, TEST_ADMIN, TEST_PASSWORD, mockApi } from './fixtures'
 
 test.describe('Admin', () => {
   test('non-admin users are redirected away from admin page', async ({ authenticatedPage: page }) => {
@@ -8,9 +8,10 @@ test.describe('Admin', () => {
   })
 
   test('admin users can access user management', async ({ page }) => {
+    await mockApi(page, { meUser: TEST_ADMIN })
     await page.goto('/auth/login')
     await page.getByLabel('Email').fill(TEST_ADMIN.email)
-    await page.getByLabel('Password').fill(TEST_ADMIN.password)
+    await page.getByLabel('Password', { exact: true }).fill(TEST_PASSWORD)
     await page.getByRole('button', { name: 'Sign In' }).click()
     await page.waitForURL('**/dashboard')
     await page.goto('/admin')

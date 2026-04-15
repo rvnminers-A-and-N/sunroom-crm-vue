@@ -6,7 +6,7 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 import { VApp } from 'vuetify/components'
 import { server } from '@/test/msw/server'
 import { renderWithPlugins } from '@/test/render'
-import { makeSmartSearchResponse, makeSummarizeResponse, makeContact, makeActivity } from '@/test/fixtures'
+import { makeSmartSearchResponse, makeSummarizeResponse, makeContact } from '@/test/fixtures'
 import { useAiStore } from '@/stores/ai.store'
 import AiPanelPage from '../AiPanelPage.vue'
 
@@ -126,7 +126,7 @@ describe('AiPanelPage', () => {
         HttpResponse.json(makeSummarizeResponse({ summary: 'This is a concise summary.' })),
       ),
     )
-    const { findByText, container } = renderPage()
+    const { container } = renderPage()
     // Switch to Summarize tab.
     const tabs = container.querySelectorAll('.v-tab')
     const summarizeTab = Array.from(tabs).find((t) => t.textContent?.includes('Summarize')) as HTMLElement

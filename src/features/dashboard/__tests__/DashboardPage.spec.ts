@@ -1,6 +1,5 @@
 import { defineComponent, h } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
-import { waitFor } from '@testing-library/vue'
 import { http, HttpResponse } from 'msw'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { VApp } from 'vuetify/components'

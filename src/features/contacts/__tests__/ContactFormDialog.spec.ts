@@ -261,8 +261,8 @@ describe('ContactFormDialog', () => {
     open.value = false
     await waitFor(() => {
       // Closed - dialog hidden
-      const titles = Array.from(document.body.querySelectorAll('.v-card-title'))
-      expect(titles.length === 0 || !titles.some((t) => t.textContent?.includes('Edit Contact')))
+      const overlay = document.body.querySelector('.v-overlay__content') as HTMLElement
+      expect(overlay?.style.display).toBe('none')
     })
     contact.value = makeContact({ id: 13, firstName: 'Second', lastName: 'Person' })
     open.value = true

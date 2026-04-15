@@ -1,5 +1,5 @@
 import { defineComponent, h } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { fireEvent, waitFor } from '@testing-library/vue'
 import { http, HttpResponse } from 'msw'
 import { VApp } from 'vuetify/components'
@@ -62,7 +62,7 @@ describe('UserManagementPage', () => {
     server.use(
       http.get(`${API}/admin/users`, () => HttpResponse.json([makeUser({ id: 1 })])),
     )
-    const result = renderPage()
+    renderPage()
     const authStore = useAuthStore()
     authStore.user = makeUser({ id: 1 })
     await waitFor(() => {

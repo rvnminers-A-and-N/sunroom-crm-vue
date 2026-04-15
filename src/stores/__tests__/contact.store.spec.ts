@@ -3,7 +3,7 @@ import { setActivePinia, createPinia } from 'pinia'
 import { http, HttpResponse } from 'msw'
 import { server } from '@/test/msw/server'
 import { useContactStore } from '../contact.store'
-import { makeContact, makeContactDetail, makePaginated, makePaginationMeta } from '@/test/fixtures'
+import { makeContact, makeContactDetail, makePaginationMeta } from '@/test/fixtures'
 
 const API = 'http://localhost:5236/api'
 
