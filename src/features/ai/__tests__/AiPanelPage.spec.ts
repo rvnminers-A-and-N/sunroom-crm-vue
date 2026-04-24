@@ -67,6 +67,7 @@ describe('AiPanelPage', () => {
     expect(await findByText('AI Assistant')).toBeInTheDocument()
     expect(await findByText('Smart Search')).toBeInTheDocument()
     expect(await findByText('Summarize')).toBeInTheDocument()
+    expect(await findByText('Deal Insights')).toBeInTheDocument()
   })
 
   it('does not submit search when query is empty', async () => {
@@ -200,6 +201,176 @@ describe('AiPanelPage', () => {
     await state.onSummarize()
     await waitFor(() => {
       expect(fetchSpy).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /* ---- Deal Insights tab ---- */
+
+  it('switches to Deal Insights tab and shows the deal ID input', async () => {
+    const { container } = renderPage()
+    const tabs = container.querySelectorAll('.v-tab')
+    const insightsTab = Array.from(tabs).find((t) => t.textContent?.includes('Deal Insights')) as HTMLElement
+    await fireEvent.click(insightsTab)
+    await waitFor(() => {
+      const inputs = document.body.querySelectorAll('input[type="number"]')
+      expect(inputs.length).toBeGreaterThan(0)
+    })
+    // Exercise the v-model setter on the deal ID input (Vuetify v-text-field).
+    const dealInput = document.body.querySelector('input[type="number"]') as HTMLInputElement
+    await fireEvent.update(dealInput, '123')
+  })
+
+  it('submits deal insights on Enter key in the deal ID input', async () => {
+    fetchSpy.mockResolvedValue(sseResponse(['Enter', ' key', ' insights.']))
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    state.tab = 2
+    state.dealIdInput = '55'
+    // Wait for the tab to render the deal insights section
+    await waitFor(() => {
+      const inputs = document.body.querySelectorAll('input[type="number"]')
+      expect(inputs.length).toBeGreaterThan(0)
+    })
+    const dealInput = document.body.querySelector('input[type="number"]') as HTMLInputElement
+    await fireEvent.keyDown(dealInput, { key: 'Enter', code: 'Enter' })
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Enter key insights.')
+    })
+  })
+
+  it('does not submit deal insights when deal ID is empty', async () => {
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    state.dealIdInput = ''
+    state.onGenerateInsights()
+    await new Promise((r) => setTimeout(r, 50))
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('does not submit deal insights for invalid (non-numeric) ID', async () => {
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    state.dealIdInput = 'abc'
+    state.onGenerateInsights()
+    await new Promise((r) => setTimeout(r, 50))
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('does not submit deal insights for zero or negative ID', async () => {
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    state.dealIdInput = '0'
+    state.onGenerateInsights()
+    await new Promise((r) => setTimeout(r, 50))
+    expect(fetchSpy).not.toHaveBeenCalled()
+
+    state.dealIdInput = '-5'
+    state.onGenerateInsights()
+    await new Promise((r) => setTimeout(r, 50))
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('generates deal insights via component ref and displays streamed results', async () => {
+    fetchSpy.mockResolvedValue(sseResponse(['Strong', ' pipeline', ' momentum.']))
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    // Switch to the Deal Insights tab
+    state.tab = 2
+    state.dealIdInput = '42'
+    await state.onGenerateInsights()
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Strong pipeline momentum.')
+    })
+  })
+
+  it('shows Insights heading when insightsResult is available', async () => {
+    fetchSpy.mockResolvedValue(sseResponse(['Recommendation:', ' increase', ' outreach.']))
+    const compRef = ref<any>(null)
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(VApp, null, {
+            default: () => h(AiPanelPage, { ref: compRef }),
+          })
+      },
+    })
+    const router = makeRouter()
+    renderWithPlugins(Wrapper, { router })
+    await waitFor(() => {
+      expect(compRef.value).not.toBeNull()
+    })
+    const state = compRef.value.$.setupState
+    state.tab = 2
+    state.dealIdInput = '7'
+    await state.onGenerateInsights()
+    await waitFor(() => {
+      expect(document.body.textContent).toContain('Insights')
+      expect(document.body.textContent).toContain('Recommendation: increase outreach.')
     })
   })
 })

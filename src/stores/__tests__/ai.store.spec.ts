@@ -99,4 +99,68 @@ describe('useAiStore', () => {
       expect(store.summarizing).toBe(false)
     })
   })
+
+  describe('dealInsights', () => {
+    it('streams tokens into insightsResult and clears generatingInsights flag', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(sseStream(['Deal', ' looks', ' strong.']), {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        }),
+      )
+      const store = useAiStore()
+      await store.dealInsights(42)
+      expect(store.insightsResult).toBe('Deal looks strong.')
+      expect(store.generatingInsights).toBe(false)
+    })
+
+    it('passes the deal ID in the URL path', async () => {
+      let capturedUrl: string | URL | Request | undefined
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, _init) => {
+        capturedUrl = url
+        return new Response(sseStream([]), {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        })
+      })
+      const store = useAiStore()
+      await store.dealInsights(99)
+      expect(capturedUrl).toContain('/ai/deal-insights/99/stream')
+    })
+
+    it('sends an empty body', async () => {
+      let capturedBody: unknown
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
+        capturedBody = JSON.parse((init as RequestInit).body as string)
+        return new Response(sseStream([]), {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        })
+      })
+      const store = useAiStore()
+      await store.dealInsights(1)
+      expect(capturedBody).toEqual({})
+    })
+
+    it('stores an error message on failure', async () => {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(null, { status: 500 }),
+      )
+      const store = useAiStore()
+      await store.dealInsights(1)
+      expect(store.insightsResult).toContain('Error')
+      expect(store.generatingInsights).toBe(false)
+    })
+
+    it('does not overwrite insightsResult on AbortError', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+        Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }),
+      )
+      const store = useAiStore()
+      await store.dealInsights(1)
+      // When aborted, insightsResult stays as the initial empty string (not replaced with Error:)
+      expect(store.insightsResult).toBe('')
+      expect(store.generatingInsights).toBe(false)
+    })
+  })
 })
