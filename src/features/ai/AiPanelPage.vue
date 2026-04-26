@@ -2,13 +2,13 @@
 import { ref } from 'vue'
 import { useAiStore } from '@/stores/ai.store'
 import PageHeader from '@/shared/components/PageHeader.vue'
-import ActivityIcon from '@/shared/components/ActivityIcon.vue'
 
 const aiStore = useAiStore()
 
 const tab = ref(0)
 const searchQuery = ref('')
 const summarizeText = ref('')
+const dealIdInput = ref('')
 
 function onSearch() {
   if (!searchQuery.value.trim()) return
@@ -18,6 +18,12 @@ function onSearch() {
 function onSummarize() {
   if (!summarizeText.value.trim()) return
   aiStore.summarize(summarizeText.value)
+}
+
+function onGenerateInsights() {
+  const id = parseInt(dealIdInput.value, 10)
+  if (isNaN(id) || id <= 0) return
+  aiStore.dealInsights(id)
 }
 
 /* c8 ignore next -- Vuetify v-tabs-window v-model setter never fires in jsdom */
@@ -32,6 +38,7 @@ function onSummarizeTextUpdate(v: string) { summarizeText.value = v }
   <v-tabs v-model="tab" color="primary">
     <v-tab :value="0">Smart Search</v-tab>
     <v-tab :value="1">Summarize</v-tab>
+    <v-tab :value="2">Deal Insights</v-tab>
   </v-tabs>
 
   <v-tabs-window :model-value="tab" @update:model-value="onTabUpdate">
@@ -65,49 +72,13 @@ function onSummarizeTextUpdate(v: string) { summarizeText.value = v }
               </v-btn>
             </div>
 
-            <div v-if="aiStore.searchResult" class="search-results">
-              <div v-if="aiStore.searchResult.interpretation" class="search-results__interpretation">
-                <v-icon size="20" color="primary">mdi-brain</v-icon>
-                <span>{{ aiStore.searchResult.interpretation }}</span>
-              </div>
-
-              <template v-if="aiStore.searchResult.contacts.length > 0">
-                <h4>Contacts ({{ aiStore.searchResult.contacts.length }})</h4>
-                <div class="search-results__list">
-                  <router-link
-                    v-for="c in aiStore.searchResult.contacts"
-                    :key="c.id"
-                    :to="{ name: 'contact-detail', params: { id: c.id } }"
-                    class="search-results__item"
-                  >
-                    <v-icon size="18" color="grey">mdi-account</v-icon>
-                    <span>{{ c.firstName }} {{ c.lastName }}</span>
-                    <span v-if="c.companyName" class="search-results__meta">{{ c.companyName }}</span>
-                  </router-link>
-                </div>
-              </template>
-
-              <template v-if="aiStore.searchResult.activities.length > 0">
-                <h4>Activities ({{ aiStore.searchResult.activities.length }})</h4>
-                <div class="search-results__list">
-                  <div
-                    v-for="a in aiStore.searchResult.activities"
-                    :key="a.id"
-                    class="search-results__item"
-                  >
-                    <ActivityIcon :type="a.type" />
-                    <span>{{ a.subject }}</span>
-                    <span class="search-results__meta">{{ a.type }}</span>
-                  </div>
-                </div>
-              </template>
-
-              <p
-                v-if="aiStore.searchResult.contacts.length === 0 && aiStore.searchResult.activities.length === 0"
-                class="search-results__empty"
-              >
-                No results found. Try rephrasing your question.
-              </p>
+            <div v-if="aiStore.searchResult || aiStore.searching" class="summary-result">
+              <h4>
+                <v-icon size="18" color="primary">mdi-brain</v-icon>
+                Results
+                <v-progress-circular v-if="aiStore.searching" indeterminate size="14" width="2" class="ml-2" />
+              </h4>
+              <p>{{ aiStore.searchResult }}<span v-if="aiStore.searching" class="typing-cursor" /></p>
             </div>
           </v-card-text>
         </v-card>
@@ -141,12 +112,57 @@ function onSummarizeTextUpdate(v: string) { summarizeText.value = v }
               </v-btn>
             </div>
 
-            <div v-if="aiStore.summaryResult" class="summary-result">
+            <div v-if="aiStore.summaryResult || aiStore.summarizing" class="summary-result">
               <h4>
                 <v-icon size="18" color="primary">mdi-auto-fix</v-icon>
                 Summary
+                <v-progress-circular v-if="aiStore.summarizing" indeterminate size="14" width="2" class="ml-2" />
               </h4>
-              <p>{{ aiStore.summaryResult }}</p>
+              <p>{{ aiStore.summaryResult }}<span v-if="aiStore.summarizing" class="typing-cursor" /></p>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
+    </v-tabs-window-item>
+
+    <!-- Deal Insights -->
+    <v-tabs-window-item :value="2">
+      <div class="ai-section">
+        <v-card>
+          <v-card-text>
+            <p class="ai-section__desc">
+              Enter a deal ID to generate AI-powered insights and recommendations.
+            </p>
+            <div class="ai-section__input-row">
+              <v-text-field
+                v-model="dealIdInput"
+                label="Deal ID"
+                prepend-inner-icon="mdi-trending-up"
+                variant="outlined"
+                density="compact"
+                hide-details
+                type="number"
+                placeholder="Enter deal ID..."
+                class="ai-section__input"
+                @keydown.enter="onGenerateInsights"
+              />
+              <v-btn
+                color="primary"
+                :loading="aiStore.generatingInsights"
+                :disabled="!dealIdInput.trim() || isNaN(parseInt(dealIdInput, 10)) || parseInt(dealIdInput, 10) <= 0"
+                @click="onGenerateInsights"
+              >
+                Generate Insights
+              </v-btn>
+            </div>
+
+            <div v-if="aiStore.insightsResult || aiStore.generatingInsights" class="summary-result">
+              <h4>
+                <v-icon size="18" color="primary">mdi-trending-up</v-icon>
+                Insights
+                <v-progress-circular v-if="aiStore.generatingInsights" indeterminate size="14" width="2" class="ml-2" />
+              </h4>
+              <p>{{ aiStore.insightsResult }}<span v-if="aiStore.generatingInsights" class="typing-cursor" /></p>
             </div>
           </v-card-text>
         </v-card>
@@ -268,6 +284,20 @@ function onSummarizeTextUpdate(v: string) { summarizeText.value = v }
     line-height: 1.6;
     white-space: pre-wrap;
   }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--sr-primary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 @media (max-width: 600px) {
