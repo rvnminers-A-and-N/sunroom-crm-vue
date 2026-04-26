@@ -59,6 +59,16 @@ describe('useAiStore', () => {
       expect(store.searchResult).toContain('Error')
       expect(store.searching).toBe(false)
     })
+
+    it('does not overwrite searchResult on AbortError', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+        Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }),
+      )
+      const store = useAiStore()
+      await store.smartSearch('q')
+      expect(store.searchResult).toBe('')
+      expect(store.searching).toBe(false)
+    })
   })
 
   describe('summarize', () => {
@@ -96,6 +106,16 @@ describe('useAiStore', () => {
       const store = useAiStore()
       await store.summarize('x')
       expect(store.summaryResult).toContain('Error')
+      expect(store.summarizing).toBe(false)
+    })
+
+    it('does not overwrite summaryResult on AbortError', async () => {
+      vi.spyOn(globalThis, 'fetch').mockRejectedValue(
+        Object.assign(new Error('The operation was aborted'), { name: 'AbortError' }),
+      )
+      const store = useAiStore()
+      await store.summarize('text')
+      expect(store.summaryResult).toBe('')
       expect(store.summarizing).toBe(false)
     })
   })
